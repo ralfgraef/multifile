@@ -9,7 +9,7 @@
                         <legend>Form Title</legend>
                         <div class="form-group">
                             <label for="">Upload Files</label>
-                            <input type="file" class="form-control" @change="fieldChange">
+                            <input type="file" multiple class="form-control" @change="fieldChange">
                         </div>
                         <button class="btn btn-primary" @click="uploadFile">Submit</button>
                     </div>
@@ -23,20 +23,32 @@
     export default {
         data(){
             return {
-                attachment: null,
+                attachments: [],
                 form: new FormData()
             }
         },
         methods:{
             fieldChange(e){
-                let selectedField = e.target.files[0];
-                this.attachment = selectedField;
+                let selectedFiles = e.target.files;
+                
+                if(!selectedFiles.length){
+                    return false;
+                };
+                
+                for (let i= 0; i < selectedFiles.length; i++) {
+                    this.attachments.push(selectedFiles[i]);
+                    
+                }
+
+                console.log(this.attachments);
             },
             uploadFile(){
-                this.form.append('pic', this.attachment);
+                for(let i= 0; i < this.attachments.length; i++){
+                    this.form.append('pics[]', this.attachments[i]);
+                }
                 
                 const config = { headers:{'Content-Type': 'multipart/form-data'}};
-                
+
                 axios.post('/upload', this.form, config)
                 .then(response=>{
                     //success
